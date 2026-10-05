@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FASTYAPI | Barbería</title>
+    <!-- CAMBIO: fuente cursiva tipo firma (Kaushan Script) para el título "Fasty".
+         Si no hay internet, se usa una cursiva del sistema como respaldo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* CAMBIO: todo el CSS es nuevo. Paleta inspirada en la web de Rand: azul noche + dorado */
+      :root {
+        --noche: #0b1030;
+        --noche-2: #141a44;
+        --dorado: #d9a441;
+        --hueso: #f4efe6;
+        --gris: #9aa0bd;
+        --error: #ff8a7a;
+        --ok: #7fd6a4;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+        background: var(--noche);
+        color: var(--hueso);
+      }
+      button {
+        font-family: inherit;
+        cursor: pointer;
+      }
+      :focus-visible {
+        outline: 2px solid var(--dorado);
+        outline-offset: 2px;
+      }
+
+      /* ---------- Barra superior ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 6vw;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .logo {
+        font-size: 1.3rem;
+        font-weight: 800;
+        letter-spacing: 0.3em;
+      }
+      .topbar-acciones {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .saludo {
+        color: var(--gris);
+        font-size: 0.95rem;
+      }
+      .saludo strong {
+        color: var(--hueso);
+      }
+
+      .btn-borde {
+        background: transparent;
+        color: var(--dorado);
+        border: 2px solid var(--dorado);
+        border-radius: 999px;
+        padding: 9px 22px;
+        font-weight: 700;
+      }
+      .btn-borde:hover {
+        background: var(--dorado);
+        color: var(--noche);
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        /* CAMBIO: position/overflow para contener el fondo animado; más alto y centrado */
+        position: relative;
+        overflow: hidden;
+        min-height: 62vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 12vh 6vw 9vh;
+        text-align: center;
+        background: #1a1d26; /* CAMBIO: base gris oscuro como el fondo del menú de referencia */
+      }
+
+      /* CAMBIO: fondo en movimiento. Tres manchas de sombra borrosas que se desplazan lento */
+      .sombra {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(70px);
+        opacity: 0.55;
+        will-change: transform;
+      }
+      .sombra.a {
+        width: 46vw;
+        height: 46vw;
+        left: -8vw;
+        top: -12vw;
+        background: #05060a;
+        animation: deriva-a 14s ease-in-out infinite alternate;
+      }
+      .sombra.b {
+        width: 40vw;
+        height: 40vw;
+        right: -6vw;
+        top: 4vw;
+        background: #3b4262;
+        animation: deriva-b 17s ease-in-out infinite alternate;
+      }
+      .sombra.c {
+        width: 34vw;
+        height: 34vw;
+        left: 32vw;
+        bottom: -16vw;
+        background: #0b0d14;
+        animation: deriva-c 20s ease-in-out infinite alternate;
+      }
+      @keyframes deriva-a {
+        to {
+          transform: translate(28vw, 14vw) scale(1.2);
+        }
+      }
+      @keyframes deriva-b {
+        to {
+          transform: translate(-30vw, 10vw) scale(0.85);
+        }
+      }
+      @keyframes deriva-c {
+        to {
+          transform: translate(-24vw, -10vw) scale(1.25);
+        }
+      }
+
+      /* CAMBIO: textura de rayitas diagonales (como la del menú de Rand) que también se desplaza */
+      .rayas {
+        position: absolute;
+        inset: -40px;
+        background: repeating-linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.035) 0 2px,
+          transparent 2px 6px
+        );
+        animation: rayas 6s linear infinite;
+      }
+      @keyframes rayas {
+        to {
+          transform: translate(24px, 24px);
+        }
+      }
+
+      /* CAMBIO: quien prefiere menos movimiento en su sistema ve el fondo quieto */
+      @media (prefers-reduced-motion: reduce) {
+        .sombra,
+        .rayas {
+          animation: none;
+        }
+      }
+
+      /* CAMBIO: título "Fasty" en cursiva y negrilla, estilo firma */
+      .hero h1 {
+        position: relative; /* sobre el fondo animado */
+        margin: 0;
+        font-family:
+          "Kaushan Script", "Brush Script MT", "Segoe Script", cursive;
+        font-size: clamp(4.5rem, 16vw, 10rem);
+        font-weight: 700; /* negrilla */
+        -webkit-text-stroke: 1.5px var(--hueso); /* engrosa el trazo para que se vea más gruesa */
+        letter-spacing: 0.02em;
+        line-height: 1.1;
+        text-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+      }
+      .hero p {
+        position: relative; /* CAMBIO: sobre el fondo animado */
+        color: var(--hueso);
+        margin: 22px 0 0;
+        font-size: 1.1rem;
+      }
+
+      /* ---------- Menú principal (3 paneles) ---------- */
+      .menu {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+      .panel {
+        padding: 70px 32px;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        transition: background 0.2s;
+      }
+      .panel:hover {
+        background: var(--noche-2);
+      }
+      .panel h2 {
+        margin: 0 0 10px;
+        letter-spacing: 0.2em;
+        font-weight: 600;
+      }
+      .panel p {
+        margin: 0;
+        color: var(--gris);
+      }
+
+      footer {
+        padding: 26px;
+        text-align: center;
+        color: var(--gris);
+        font-size: 0.85rem;
+      }
+
+      /* ---------- Modal (la "ventanita") ---------- */
+      .fondo-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(5, 8, 24, 0.75);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        z-index: 10;
+      }
+      .oculto {
+        display: none !important;
+      }
+
+      .modal {
+        position: relative;
+        width: 100%;
+        max-width: 440px;
+        background: #fff;
+        color: #1b1f3a;
+        border-radius: 20px;
+        padding: 36px 32px 30px;
+        animation: abrir 0.18s ease-out; /* movimiento solo al abrir la ventana */
+      }
+      @keyframes abrir {
+        from {
+          transform: translateY(12px);
+          opacity: 0;
+        }
+        to {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .modal {
+          animation: none;
+        }
+      }
+
+      .cerrar {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        background: none;
+        border: 0;
+        font-size: 1.8rem;
+        line-height: 1;
+        color: #1b1f3a;
+      }
+      .modal h2 {
+        margin: 0 0 4px;
+        font-size: 1.7rem;
+        text-align: center;
+      }
+      .modal .sub {
+        margin: 0 0 22px;
+        text-align: center;
+        color: #5b607f;
+      }
+
+      .pestanas {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 22px;
+      }
+      .pestana {
+        flex: 1;
+        padding: 10px;
+        border: 0;
+        border-bottom: 3px solid #e3e5f0;
+        background: none;
+        font-weight: 600;
+        color: #5b607f;
+      }
+      .pestana[aria-selected="true"] {
+        color: #1b1f3a;
+        border-color: var(--dorado);
+      }
+
+      label {
+        display: block;
+        margin: 14px 0 6px;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .campo {
+        position: relative;
+      }
+      .campo input {
+        width: 100%;
+        padding: 13px 14px;
+        border: 1px solid #c9cce0;
+        border-radius: 10px;
+        font-size: 1rem;
+      }
+      .ojo {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: 0;
+        padding: 6px 8px;
+        color: #5b607f;
+        font-size: 0.85rem;
+      }
+
+      .mensaje {
+        min-height: 22px;
+        margin: 14px 0 0;
+        font-size: 0.93rem;
+      }
+      .mensaje.error {
+        color: #c0392b;
+      }
+      .mensaje.ok {
+        color: #1e8449;
+      }
+
+      .btn-principal {
+        width: 100%;
+        margin-top: 8px;
+        padding: 14px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--noche);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+      .btn-principal:hover {
+        background: var(--noche-2);
+      }
+      .btn-principal:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- CAMBIO: barra superior con el botón que abre el login en ventanita -->
+    <header class="topbar">
+      <div class="logo">FASTYAPI</div>
+      <div class="topbar-acciones">
+        <!-- Se muestra cuando NO hay sesión -->
+        <button id="btn-abrir-login" class="btn-borde" type="button">
+          Iniciar sesión
+        </button>
+        <!-- Se muestra cuando SÍ hay sesión -->
+        <span id="saludo" class="saludo oculto"></span>
+        <button id="btn-salir" class="btn-borde oculto" type="button">
+          Cerrar sesión
+        </button>
+      </div>
+    </header>
+
+    <!-- CAMBIO: menú principal (reemplaza los dos botones y formularios sueltos de antes) -->
+    <section class="hero">
+      <!-- CAMBIO: capas del fondo en movimiento (solo decorativas) -->
+      <div class="sombra a" aria-hidden="true"></div>
+      <div class="sombra b" aria-hidden="true"></div>
+      <div class="sombra c" aria-hidden="true"></div>
+      <div class="rayas" aria-hidden="true"></div>
+
+      <!-- CAMBIO: antes decía "BARBERÍA", ahora "Fasty" -->
+      <h1>Fasty</h1>
+      <p>Para hombres de grandeza</p>
+    </section>
+
+    <main class="menu">
+      <article class="panel">
+        <h2>Servicios</h2>
+        <p>Corte, barba y cejas</p>
+      </article>
+      <article class="panel">
+        <h2>Citas</h2>
+        <p>Reserva con tu barbero</p>
+      </article>
+      <article class="panel">
+        <h2>Productos</h2>
+        <p>Ceras, aceites y cuidado de barba</p>
+      </article>
+    </main>
+
+    <footer>© FASTYAPI</footer>
+
+    <!-- CAMBIO: modal con pestañas Ingresar / Crear cuenta. Aparece encima del menú -->
+    <div id="fondo-modal" class="fondo-modal oculto">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal"
+      >
+        <button
+          id="btn-cerrar"
+          class="cerrar"
+          type="button"
+          aria-label="Cerrar"
+        >
+          &times;
+        </button>
+
+        <h2 id="titulo-modal">Ingresar a mi cuenta</h2>
+        <p id="sub-modal" class="sub">Ingresa tu usuario y contraseña</p>
+
+        <div class="pestanas" role="tablist">
+          <button
+            class="pestana"
+            id="tab-login"
+            role="tab"
+            aria-selected="true"
+            type="button"
+          >
+            Ingresar
+          </button>
+          <button
+            class="pestana"
+            id="tab-registro"
+            role="tab"
+            aria-selected="false"
+            type="button"
+          >
+            Crear cuenta
+          </button>
+        </div>
+
+        <!-- CAMBIO: un solo formulario que sirve para login y registro -->
+        <form id="form-auth" novalidate>
+          <label for="usuario">Usuario</label>
+          <div class="campo">
+            <input
+              type="text"
+              id="usuario"
+              name="usuario"
+              autocomplete="username"
+              required
+            />
+          </div>
+
+          <label for="password">Contraseña</label>
+          <div class="campo">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              autocomplete="current-password"
+              required
+            />
+            <button id="btn-ojo" class="ojo" type="button">Mostrar</button>
+          </div>
+
+          <!-- CAMBIO: aquí se muestran errores/éxito sin salir de la página -->
+          <p id="mensaje" class="mensaje" role="status" aria-live="polite"></p>
+
+          <button id="btn-enviar" class="btn-principal" type="submit">
+            Ingresar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // ---------- Referencias a elementos ----------
+      const fondo = document.getElementById("fondo-modal");
+      const form = document.getElementById("form-auth");
+      const inputUsuario = document.getElementById("usuario");
+      const inputPassword = document.getElementById("password");
+      const mensaje = document.getElementById("mensaje");
+      const btnEnviar = document.getElementById("btn-enviar");
+
+      let modo = "login"; // CAMBIO: "login" o "registro", decide a qué ruta se envía
+
+      // ---------- Abrir / cerrar la ventanita ----------
+      function abrirModal(nuevoModo) {
+        cambiarModo(nuevoModo || "login");
+        fondo.classList.remove("oculto");
+        inputUsuario.focus();
+      }
+
+      function cerrarModal() {
+        fondo.classList.add("oculto");
+        form.reset();
+        mostrarMensaje("", "");
+      }
+
+      document.getElementById("btn-abrir-login").onclick = () =>
+        abrirModal("login");
+      document.getElementById("btn-cerrar").onclick = cerrarModal;
+      // CAMBIO: clic fuera de la ventanita la cierra
+      fondo.addEventListener("click", (e) => {
+        if (e.target === fondo) cerrarModal();
+      });
+      // CAMBIO: tecla Esc también la cierra
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !fondo.classList.contains("oculto"))
+          cerrarModal();
+      });
+
+      // ---------- Pestañas Ingresar / Crear cuenta ----------
+      function cambiarModo(nuevo) {
+        modo = nuevo;
+        const esLogin = nuevo === "login";
+        document
+          .getElementById("tab-login")
+          .setAttribute("aria-selected", esLogin);
+        document
+          .getElementById("tab-registro")
+          .setAttribute("aria-selected", !esLogin);
+        document.getElementById("titulo-modal").textContent = esLogin
+          ? "Ingresar a mi cuenta"
+          : "Crear mi cuenta";
+        document.getElementById("sub-modal").textContent = esLogin
+          ? "Ingresa tu usuario y contraseña"
+          : "Elige un usuario y una contraseña de 6+ caracteres";
+        btnEnviar.textContent = esLogin ? "Ingresar" : "Crear cuenta";
+        inputPassword.autocomplete = esLogin
+          ? "current-password"
+          : "new-password";
+        mostrarMensaje("", "");
+      }
+      document.getElementById("tab-login").onclick = () => cambiarModo("login");
+      document.getElementById("tab-registro").onclick = () =>
+        cambiarModo("registro");
+
+      // ---------- Mostrar / ocultar contraseña ----------
+      document.getElementById("btn-ojo").onclick = (e) => {
+        const visible = inputPassword.type === "text";
+        inputPassword.type = visible ? "password" : "text";
+        e.target.textContent = visible ? "Mostrar" : "Ocultar";
+      };
+
+      function mostrarMensaje(texto, tipo) {
+        mensaje.textContent = texto;
+        mensaje.className = "mensaje " + tipo;
+      }
+
+      // ---------- Enviar login / registro al servidor ----------
+      // CAMBIO: antes el <form> hacía POST y recargaba la página; ahora usamos fetch
+      // para hablar con /login o /registro y quedarnos en el menú principal
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const usuario = inputUsuario.value.trim();
+        const password = inputPassword.value;
+        if (!usuario || !password) {
+          return mostrarMensaje("Completa usuario y contraseña.", "error");
+        }
+
+        btnEnviar.disabled = true;
+        mostrarMensaje("Un momento...", "");
+
+        try {
+          const res = await fetch(modo === "login" ? "/login" : "/registro", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ usuario, password }),
+          });
+          const data = await res.json();
+
+          if (data.ok) {
+            guardarSesion(data.usuario); // CAMBIO: recordamos al usuario
+            mostrarSesion(data.usuario); // CAMBIO: el menú pasa a modo "con sesión"
+            cerrarModal();
+          } else {
+            mostrarMensaje(data.error || "Algo salió mal.", "error");
+          }
+        } catch (err) {
+          mostrarMensaje("No hay conexión con el servidor.", "error");
+        } finally {
+          btnEnviar.disabled = false;
+        }
+      });
+
+      // ---------- Sesión en el menú principal ----------
+      // CAMBIO: localStorage guarda solo el nombre para mostrar el saludo al recargar.
+      // OJO: no es seguridad real; para proteger rutas más adelante usa JWT o sesiones.
+      function guardarSesion(usuario) {
+        try {
+          localStorage.setItem("usuario", usuario);
+        } catch (e) {}
+      }
+      function leerSesion() {
+        try {
+          return localStorage.getItem("usuario");
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function mostrarSesion(usuario) {
+        document.getElementById("btn-abrir-login").classList.add("oculto");
+        document.getElementById("saludo").innerHTML = "Hola, <strong></strong>";
+        document.querySelector("#saludo strong").textContent = usuario; // textContent evita inyección de HTML
+        document.getElementById("saludo").classList.remove("oculto");
+        document.getElementById("btn-salir").classList.remove("oculto");
+      }
+
+      function mostrarSinSesion() {
+        document.getElementById("btn-abrir-login").classList.remove("oculto");
+        document.getElementById("saludo").classList.add("oculto");
+        document.getElementById("btn-salir").classList.add("oculto");
+      }
+
+      document.getElementById("btn-salir").onclick = () => {
+        try {
+          localStorage.removeItem("usuario");
+        } catch (e) {}
+        mostrarSinSesion();
+      };
+
+      // CAMBIO: al cargar la página, si ya había sesión, se muestra el saludo
+      const guardado = leerSesion();
+      if (guardado) mostrarSesion(guardado);
+    </script>
+  </body>
+</html>
