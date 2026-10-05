@@ -9,6 +9,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// NUEVO: permite que el frontend (localhost:5173) llame al backend (localhost:3000)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
 // Conexión a Neon PostgreSQL usando la URL del .env
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -125,6 +132,11 @@ app.post("/login", async (req, res) => {
       .status(500)
       .json({ ok: false, error: "Error en el servidor. Intenta de nuevo." }); // CAMBIO: JSON
   }
+});
+
+// NUEVO: endpoint que le indica al frontend a qué URL debe ir
+app.get("/api/ir-citas", (req, res) => {
+  res.json({ ok: true, url: "/citas" });
 });
 
 // 4. RUTA PÁGINA PRINCIPAL (sin cambios)
